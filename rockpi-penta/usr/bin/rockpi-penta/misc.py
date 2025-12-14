@@ -95,8 +95,8 @@ def read_conf():
 
 
 def read_key(pattern, size):
-    CHIP_NAME = os.environ['BUTTON_CHIP']
-    LINE_NUMBER = os.environ['BUTTON_LINE']
+    CHIP_NAME = '4'
+    LINE_NUMBER = 17
 
     s = ''
     chip = gpiod.Chip(str(CHIP_NAME))
@@ -123,7 +123,6 @@ def watch_key(q=None):
 
     while True:
         q.put(read_key(pattern, size))
-
 
 def get_disk_info(cache={}):
     if not cache.get('time') or time.time() - cache['time'] > 30:
@@ -165,3 +164,4 @@ def get_func(key):
 
 conf = {'disk': [], 'idx': mp.Value('d', -1), 'run': mp.Value('d', 1)}
 conf.update(read_conf())
+
