@@ -22,8 +22,8 @@ font = {
 
 
 def disp_init():
-    RESET = getattr(board.pin, os.environ['OLED_RESET'])
-    i2c = busio.I2C(getattr(board.pin, os.environ['SCL']), getattr(board.pin, os.environ['SDA']))
+    RESET = board.D23
+    i2c = busio.I2C(board.SCL, board.SDA)
     disp = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c, reset=digitalio.DigitalInOut(RESET))
     disp.fill(0)
     disp.show()
@@ -54,7 +54,6 @@ def goodbye():
     disp_show()
     time.sleep(2)
     disp_show()  # clear
-
 
 def put_disk_info():
     k, v = misc.get_disk_info()
