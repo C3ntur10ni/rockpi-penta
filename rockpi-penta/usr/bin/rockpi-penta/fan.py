@@ -55,7 +55,8 @@ class Gpio:
             time.sleep(self.value[1])
 
     def __init__(self, period_s):
-        self.line = gpiod.Chip(os.environ['FAN_CHIP']).get_line(int(os.environ['FAN_LINE']))
+        # UPRAVENE PRE RASPBERRY PI 5 (Chip 4, Line 27)
+        self.line = gpiod.Chip('4').get_line(27)
         self.line.request(consumer='fan', type=gpiod.LINE_REQ_DIR_OUT)
         self.value = [period_s / 2, period_s / 2]
         self.period_s = period_s
@@ -65,7 +66,6 @@ class Gpio:
     def write(self, duty):
         self.value[1] = duty * self.period_s
         self.value[0] = self.period_s - self.value[1]
-
 
 def read_temp():
     with open('/sys/class/thermal/thermal_zone0/temp') as f:
@@ -92,7 +92,7 @@ def change_dc(dc, cache={}):
 
 def running():
     global pin
-    if os.environ['HARDWARE_PWM'] == '1':
+    if '0' == '1':
         chip = os.environ['PWMCHIP']
         pin = Pwm(chip)
         pin.period_us(40)
