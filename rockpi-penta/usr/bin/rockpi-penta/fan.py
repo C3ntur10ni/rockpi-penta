@@ -67,10 +67,39 @@ class Gpio:
         self.value[1] = duty * self.period_s
         self.value[0] = self.period_s - self.value[1]
 
+# OLD ORIGINAL FUNCTION NA CITANIE TEMP - ale CPU
+#def read_temp():
+#   with open('/sys/class/thermal/thermal_zone0/temp') as f:
+#        t = int(f.read().strip()) / 1000.0
+#    return t
+
 def read_temp():
-    with open('/sys/class/thermal/thermal_zone0/temp') as f:
-        t = int(f.read().strip()) / 1000.0
-    return t
+    # 1. Ziskaj teplotu CPU
+    try:
+        with open('/sys/class/thermal/thermal_zone0/temp') as f:
+            t_cpu = int(f.read().strip()) / 1000.0
+    except:
+        t_cpu = 0
+
+    # 2. Ziskaj teplotu Diskov
+    max_disk_temp = 0
+    # Prikaz na ziskanie teploty (len ak disk nespi)
+    cmd = "smartctl -A -n standby /dev/{} | grep -i 'Temperature_Celsius' | awk '{{print $10}}'"
+
+    for drive in ['sda', 'sdb', 'sdc', 'sdd']:
+        if os.path.exists('/dev/' + drive):
+            try:
+                # Spustenie prikazu
+                output = subprocess.check_output(cmd.format(drive), shell=True).decode().strip()
+                if output.isdigit():
+                    t_disk = float(output)
+                    if t_disk > max_disk_temp:
+                        max_disk_temp = t_disk
+            except:
+                pass
+
+    # 3. Vrat vyssiu z tychto dvoch teplot
+    return max(t_cpu, max_disk_temp)
 
 
 def get_dc(cache={}):
